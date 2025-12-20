@@ -23,28 +23,48 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     // Find user with password field (normally excluded)
-    const user = await this.usersService.findByEmail(loginDto.email);
+    const user = await this.usersService.findByEmailWithPassword(
+      loginDto.email,
+    );
+    console.log(user);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Need to fetch password separately since it's excluded by default
-    const userWithPassword = await this.usersService.findByEmailWithPassword(
-      loginDto.email,
-    );
+    // Check if user is active
+    if (!user.isActive) {
+      throw new UnauthorizedException('Account is inactive');
+    }
+
+    // Check if user registered with Google (no password set)
+    if (
+      user.authProvider === AuthProvider.GOOGLE &&
+      (!user.password || user.password === null)
+    ) {
+      console.log(user.password);
+      throw new UnauthorizedException(
+        'This account was created with Google, Please use "Continue with Google" to login.',
+      );
+    }
+
+    // Get user with password for validation
+    // const userWithPassword = await this.usersService.findByEmailWithPassword(
+    //   loginDto.email,
+    // );
+
+    // Additional safety check - if password is null, reject
+    if (!user.password) {
+      throw new UnauthorizedException(
+        'This account has no password set. Please use social login or reset your password.',
+      );
+    }
 
     // Validate password
-    const isPasswordValid = await userWithPassword.validatePassword(
-      loginDto.password,
-    );
+    const isPasswordValid = await user.validatePassword(loginDto.password);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
-    }
-
-    if (!user.isActive) {
-      throw new UnauthorizedException('Account is inactive');
     }
 
     // Generate JWT token

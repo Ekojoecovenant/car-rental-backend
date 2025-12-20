@@ -78,7 +78,17 @@ export class UsersService {
   async findByEmailWithPassword(email: string): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'password', 'fullName', 'role', 'isActive'], // Explicitly include password
+      select: [
+        'id',
+        'fullName',
+        'email',
+        'password', // Explicitly include password
+        'role',
+        'authProvider',
+        'googleId',
+        'isEmailVerified',
+        'isActive',
+      ],
     });
     return user as User;
   }
@@ -100,6 +110,7 @@ export class UsersService {
     const user = await this.findById(userId);
     user.googleId = googleId;
     user.authProvider = AuthProvider.GOOGLE;
+    user.isEmailVerified = true;
     return this.usersRepository.save(user);
   }
 }
