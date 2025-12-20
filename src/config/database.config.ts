@@ -14,7 +14,7 @@ export const getDatabaseConfig = (
   ssl: {
     rejectUnauthorized: false, // Required for Neon
   },
-  entities: [User], // Adding entities individually
+  entities: [User], // Explicit import - we'll add more as we create them
   synchronize: configService.get<string>('NODE_ENV') === 'development',
   logging: configService.get<string>('NODE_ENV') === 'development',
 });
