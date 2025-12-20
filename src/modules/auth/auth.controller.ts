@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -22,9 +22,17 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Post('profile')
+  @Get('profile')
   @UseGuards(JwtAuthGuard)
-  getProfile(@CurrentUser() user) {
+  getProfile(
+    @CurrentUser()
+    user: {
+      id: string;
+      email: string;
+      role: string;
+      isEmailVerified: boolean;
+    },
+  ) {
     return {
       message: 'Profile retrieved successfully',
       data: user,
