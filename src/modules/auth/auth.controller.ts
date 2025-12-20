@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/await-thenable */
 import {
   Body,
   Controller,
@@ -16,11 +14,15 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -54,14 +56,15 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  async googleAuthRedirect(@Req() req, @Res() res: Response) {
+  googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     // Generate JWT toekn for the user
-    const tokens = await this.authService.generateTokens(req.user);
+    const tokens = this.authService.generateTokens(req.user);
 
     // For now, just redirect to frontend with token in URL
     // In production, you'd handle this more securely
-    res.redirect(
-      `${process.env.FRONTEND_URL}/auth/callback?token=${tokens.accessToken}`,
+    const googleAuthRedirect = this.configService.get<string>(
+      'GOOGLE_AUTH_REDIRECT',
     );
+    res.redirect(`${googleAuthRedirect}?token=${tokens.accessToken}`);
   }
 }
