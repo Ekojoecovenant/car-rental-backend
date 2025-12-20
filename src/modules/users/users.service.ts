@@ -113,4 +113,38 @@ export class UsersService {
     user.isEmailVerified = true;
     return this.usersRepository.save(user);
   }
+
+  async saveVerificationToken(
+    userId: string,
+    token: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    const user = await this.findById(userId);
+    user.emailVerificationToken = token;
+    user.emailVerificationExpires = expiresAt;
+    await this.usersRepository.save(user);
+  }
+
+  async findByIdWithToken(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      select: [
+        'id',
+        'email',
+        'fullName',
+        'isEmailVerified',
+        'emailVerificationToken',
+        'emailVerificationExpires',
+      ],
+    });
+    return user as User;
+  }
+
+  async markEmailAsVerified(userId: string): Promise<void> {
+    const user = await this.findById(userId);
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+    await this.usersRepository.save(user);
+  }
 }
