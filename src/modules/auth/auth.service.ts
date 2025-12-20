@@ -1,8 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { AuthProvider } from '../users/entities/user.entity';
+
+interface GoogleUserData {
+  googleId: string;
+  email: string;
+  fullName: string;
+  profilePicture?: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -57,5 +67,43 @@ export class AuthService {
 
   async validateUser(userId: string) {
     return this.usersService.findById(userId);
+  }
+
+  async validateGoogleUser(googleData: GoogleUserData) {
+    // Check if user exists by Google ID
+    let user = await this.usersService.findByGoogleId(googleData.googleId);
+
+    if (user) {
+      return user; // User already registered with Google
+    }
+
+    // Check if user exists by email (registered with email/password before)
+    user = await this.usersService.findByEmail(googleData.email);
+
+    if (user) {
+      // Link Google acccount to existing user
+      return this.usersService.linkGoogleAccount(user.id, googleData.googleId);
+    }
+
+    // Create new user with Google OAuth
+    return this.usersService.createGoogleUser({
+      email: googleData.email,
+      fullName: googleData.fullName,
+      googleId: googleData.googleId,
+      authProvider: AuthProvider.GOOGLE,
+      isEmailVerified: true,
+    });
+  }
+
+  generateTokens(user: any) {
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    return {
+      accessToken: this.jwtService.sign(payload),
+    };
   }
 }
