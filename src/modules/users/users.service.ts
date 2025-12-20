@@ -74,4 +74,12 @@ export class UsersService {
     user.isActive = false; // Soft delete
     await this.usersRepository.save(user);
   }
+
+  async findByEmailWithPassword(email: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'password', 'fullName', 'role', 'isActive'], // Explicitly include password
+    });
+    return user as User;
+  }
 }
