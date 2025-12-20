@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { AuthProvider, User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -81,5 +81,25 @@ export class UsersService {
       select: ['id', 'email', 'password', 'fullName', 'role', 'isActive'], // Explicitly include password
     });
     return user as User;
+  }
+
+  async findByGoogleId(googleId: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { googleId } });
+    return user as User;
+  }
+
+  async createGoogleUser(userData: Partial<User>): Promise<User> {
+    const user = this.usersRepository.create({
+      ...userData,
+      isEmailVerified: true, // Google emails are already verified
+    });
+    return this.usersRepository.save(user);
+  }
+
+  async linkGoogleAccount(userId: string, googleId: string): Promise<User> {
+    const user = await this.findById(userId);
+    user.googleId = googleId;
+    user.authProvider = AuthProvider.GOOGLE;
+    return this.usersRepository.save(user);
   }
 }
