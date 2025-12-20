@@ -70,6 +70,20 @@ export class User {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @Column({
+    name: 'email_verification_token',
+    nullable: true,
+    select: false,
+  })
+  emailVerificationToken: string;
+
+  @Column({
+    name: 'email_verfication_expires',
+    type: 'timestamp',
+    nullable: true,
+  })
+  emailVerificationExpires: Date;
+
   // Automatically hash password before saving
   @BeforeInsert()
   @BeforeUpdate()
