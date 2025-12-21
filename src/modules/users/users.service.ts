@@ -141,10 +141,10 @@ export class UsersService {
   }
 
   async markEmailAsVerified(userId: string): Promise<void> {
-    const user = await this.findById(userId);
-    user.isEmailVerified = true;
-    user.emailVerificationToken = null;
-    user.emailVerificationExpires = null;
-    await this.usersRepository.save(user);
+    await this.usersRepository.update(userId, {
+      isEmailVerified: true,
+      emailVerificationToken: null,
+      emailVerificationExpires: null,
+    });
   }
 }
