@@ -45,7 +45,7 @@ export class OtpService {
     };
   }
 
-  async verifyOtop(userId: string, otp: string) {
+  async verifyOtp(userId: string, otp: string) {
     const user = await this.usersService.findByIdWithToken(userId);
 
     if (!user) {

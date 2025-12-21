@@ -16,18 +16,40 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { OtpService } from './otp.service';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { ResendOtpDto } from './dto/resend-otp.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
+    private otpService: OtpService,
   ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  async register(@Body() createUserDto: CreateUserDto) {
+    // Create user
+    const user = await this.authService.register(createUserDto);
+
+    // Send OTP
+    await this.otpService.sendVerificationOtp(user.id);
+
+    return {
+      message:
+        'Registration successful. Please check your email for verification code.',
+      userId: user.id,
+      email: user.email,
+    };
   }
 
   @Get('profile')
@@ -66,5 +88,17 @@ export class AuthController {
       'GOOGLE_AUTH_REDIRECT',
     );
     res.redirect(`${googleAuthRedirect}?token=${tokens.accessToken}`);
+  }
+
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmail(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.otpService.verifyOtp(verifyOtpDto.userId, verifyOtpDto.otp);
+  }
+
+  @Post('resend-otp')
+  @HttpCode(HttpStatus.OK)
+  async resendOtp(@Body() resendOtpDto: ResendOtpDto) {
+    return this.otpService.resendOtp(resendOtpDto.userId);
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
@@ -83,6 +84,10 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+
+  async register(createUserDto: any) {
+    return this.usersService.create(createUserDto);
   }
 
   async validateUser(userId: string) {
