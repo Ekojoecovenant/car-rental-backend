@@ -54,7 +54,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  async getProfile(
+  getProfile(
     @CurrentUser()
     user: {
       id: string;
@@ -63,11 +63,9 @@ export class AuthController {
       isEmailVerified: boolean;
     },
   ) {
-    const userProf = await this.authService.profile(user.id);
-
     return {
       message: 'Profile retrieved successfully',
-      data: userProf,
+      data: user,
     };
   }
 
