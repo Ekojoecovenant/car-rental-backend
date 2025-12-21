@@ -33,11 +33,19 @@ export class OtpService {
     await this.usersService.saveVerificationToken(userId, otp, expiresAt);
 
     // Send email
-    await this.emailService.sendVerificationEmail(
-      user.email,
-      otp,
-      user.fullName,
-    );
+    try {
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        otp,
+        user.fullName,
+      );
+    } catch (error) {
+      console.error('Email sending failed:', error);
+
+      throw new BadRequestException(
+        'Failed to send verification email. Please try resending OTP or contact support.',
+      );
+    }
 
     return {
       message: 'Verification code sent to your email',
@@ -78,8 +86,13 @@ export class OtpService {
     // Mark email as verified and clear OTP
     await this.usersService.markEmailAsVerified(userId);
 
-    // Send welcome email
-    await this.emailService.sendWelcomeEmail(user.email, user.fullName);
+    // Try to send welcome email (non-critical, don't fail if it doesn't send)
+    try {
+      await this.emailService.sendWelcomeEmail(user.email, user.fullName);
+    } catch (error) {
+      console.error('Welcome email failed:', error);
+      // Don't throw error - verification was successful
+    }
 
     return {
       message: 'Email verified successfully',

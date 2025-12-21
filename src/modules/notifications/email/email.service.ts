@@ -1,19 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Resend } from 'resend';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-  private resend: Resend;
+  private transporter: nodemailer.Transporter;
 
   constructor(private configService: ConfigService) {
-    this.resend = new Resend(this.configService.get('RESEND_API_KEY'));
+    this.transporter = nodemailer.createTransport({
+      host: this.configService.get('EMAIL_HOST'),
+      port: this.configService.get('EMAIL_PORT'),
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: this.configService.get('EMAIL_USER'),
+        pass: this.configService.get('EMAIL_PASSWORD'),
+      },
+    });
   }
 
   async sendVerificationEmail(email: string, otp: string, fullName: string) {
-    await this.resend.emails.send({
+    const mailOptions = {
       from: `FleetCord <noreply@fleetcord.com>`,
-      to: [email],
+      to: email,
       subject: 'Verify Your Email - FleetCord',
       html: `
         <!DOCTYPE html>
@@ -91,13 +99,15 @@ export class EmailService {
         </body>
         </html>
       `,
-    });
+    };
+
+    await this.transporter.sendMail(mailOptions);
   }
 
   async sendWelcomeEmail(email: string, fullName: string) {
-    await this.resend.emails.send({
+    const mailOptions = {
       from: `FleetCord <noreply@fleetcord.com`,
-      to: [email],
+      to: email,
       subject: 'Welcome to FleetCord! 🎉',
       html: `
         <!DOCTYPE html>
@@ -192,6 +202,8 @@ export class EmailService {
         </body>
         </html>
       `,
-    });
+    };
+
+    await this.transporter.sendMail(mailOptions);
   }
 }
