@@ -75,14 +75,14 @@ export class User {
     nullable: true,
     select: false,
   })
-  emailVerificationToken: string;
+  emailVerificationToken: string | null;
 
   @Column({
     name: 'email_verfication_expires',
     type: 'timestamp',
     nullable: true,
   })
-  emailVerificationExpires: Date;
+  emailVerificationExpires: Date | null;
 
   // Automatically hash password before saving
   @BeforeInsert()
