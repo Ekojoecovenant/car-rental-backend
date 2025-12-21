@@ -72,6 +72,7 @@ export class User {
 
   @Column({
     name: 'email_verification_token',
+    type: 'varchar',
     nullable: true,
     select: false,
   })
