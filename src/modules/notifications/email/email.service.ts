@@ -1,28 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private resend: Resend;
 
   constructor(private configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: this.configService.get('EMAIL_HOST'),
-      port: this.configService.get('EMAIL_PORT'),
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: this.configService.get('EMAIL_USER'),
-        pass: this.configService.get('EMAIL_PASSWORD'),
-      },
-    });
+    this.resend = new Resend(this.configService.get('RESEND_API_KEY'));
   }
 
   async sendVerificationEmail(email: string, otp: string, fullName: string) {
-    const mailOptions = {
-      from: this.configService.get<string>('EMAIL_FROM'),
-      to: email,
-      subject: 'Verify Your Email - WatersMet Car Rentals',
+    await this.resend.emails.send({
+      from: `FleetCord <noreply@fleetcord.com>`,
+      to: [email],
+      subject: 'Verify Your Email - FleetCord',
       html: `
         <!DOCTYPE html>
         <html>
@@ -90,25 +82,23 @@ export class EmailService {
               
               <p>If you didn't create an account with us, please ignore this email.</p>
               
-              <p>Best regards,<br>Rento | Car Rentals/p>
+              <p>Best regards,<br>FleetCord</p>
             </div>
             <div class="footer">
-              <p>© 2026 Rento | Car Rentals. All rights reserved.</p>
+              <p>© 2026 FleetCord. All rights reserved.</p>
             </div>
           </div>
         </body>
         </html>
       `,
-    };
-
-    await this.transporter.sendMail(mailOptions);
+    });
   }
 
   async sendWelcomeEmail(email: string, fullName: string) {
-    const mailOptions = {
-      from: this.configService.get<string>('EMAIL_FROM'),
-      to: email,
-      subject: 'Welcome to Car Rental Platform! 🎉',
+    await this.resend.emails.send({
+      from: `FleetCord <noreply@fleetcord.com`,
+      to: [email],
+      subject: 'Welcome to FleetCord! 🎉',
       html: `
         <!DOCTYPE html>
         <html>
@@ -193,21 +183,15 @@ export class EmailService {
               
               <p>If you have any questions, feel free to reach out to our support team.</p>
               
-              <p>Happy renting!<br>Rento | Car Rentals</p>
+              <p>Happy renting!<br>FleetCord</p>
             </div>
             <div class="footer">
-              <p>© 2026 Rento | Car Rentals. All rights reserved.</p>
+              <p>© 2026 FleetCord. All rights reserved.</p>
             </div>
           </div>
         </body>
         </html>
       `,
-    };
-
-    await this.transporter.sendMail(mailOptions);
+    });
   }
 }
-
-// reminder to use redis instead on user.entity to store verification token
-// continue from sendWelcomEmail
-// smth smth
