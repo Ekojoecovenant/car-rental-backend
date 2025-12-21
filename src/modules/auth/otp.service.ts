@@ -62,7 +62,10 @@ export class OtpService {
       );
     }
 
-    if (user.emailVerificationExpires < new Date()) {
+    if (
+      !user.emailVerificationExpires ||
+      user.emailVerificationExpires < new Date()
+    ) {
       throw new BadRequestException(
         'Verification code expired. Please request a new one.',
       );
