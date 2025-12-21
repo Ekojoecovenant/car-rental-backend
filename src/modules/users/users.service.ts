@@ -82,12 +82,15 @@ export class UsersService {
         'id',
         'fullName',
         'email',
+        'phoneNumber',
         'password', // Explicitly include password
         'role',
         'authProvider',
         'googleId',
         'isEmailVerified',
         'isActive',
+        'createdAt',
+        'updatedAt',
       ],
     });
     return user as User;

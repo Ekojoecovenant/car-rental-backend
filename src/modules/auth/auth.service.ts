@@ -81,13 +81,20 @@ export class AuthService {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
         role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
       },
     };
   }
 
   async register(createUserDto: any) {
     return this.usersService.create(createUserDto);
+  }
+
+  async profile(userId: string) {
+    return this.usersService.findById(userId);
   }
 
   async validateUser(userId: string) {
