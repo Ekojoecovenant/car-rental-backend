@@ -90,10 +90,10 @@ export class EmailService {
               
               <p>If you didn't create an account with us, please ignore this email.</p>
               
-              <p>Best regards,<br>The Car Rental Team</p>
+              <p>Best regards,<br>Rento | Car Rentals/p>
             </div>
             <div class="footer">
-              <p>© 2024 Car Rental Platform. All rights reserved.</p>
+              <p>© 2026 Rento | Car Rentals. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -158,6 +158,12 @@ export class EmailService {
             .features li {
               margin: 8px 0;
             }
+            .footer {
+              text-align: center;
+              margin-top: 20px;
+              color: #666;
+              font-size: 12px;
+            }
           </style>
         </head>
         <body>
@@ -187,7 +193,10 @@ export class EmailService {
               
               <p>If you have any questions, feel free to reach out to our support team.</p>
               
-              <p>Happy renting!<br>The Car Rental Team</p>
+              <p>Happy renting!<br>Rento | Car Rentals</p>
+            </div>
+            <div class="footer">
+              <p>© 2026 Rento | Car Rentals. All rights reserved.</p>
             </div>
           </div>
         </body>
