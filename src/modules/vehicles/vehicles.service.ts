@@ -7,7 +7,7 @@ import { UpdateVehicleDto } from './dto/update-user.dto';
 import { FilterVehicleDto } from './dto/filter-vehicle.dto';
 
 @Injectable()
-export class VehicleService {
+export class VehiclesService {
   constructor(
     @InjectRepository(Vehicle)
     private vehicleRepository: Repository<Vehicle>,

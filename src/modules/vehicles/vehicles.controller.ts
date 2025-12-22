@@ -14,7 +14,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { VehicleService } from './vehicle.service';
+import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-user.dto';
 import { CloudinaryService } from './cloudinary.service';
@@ -26,9 +26,9 @@ import { UserRole } from '../users/entities/user.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('vehicles')
-export class VehicleController {
+export class VehiclesController {
   constructor(
-    private readonly vehicleService: VehicleService,
+    private readonly vehicleService: VehiclesService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
