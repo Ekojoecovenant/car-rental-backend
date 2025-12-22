@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { UserRole } from '../../users/entities/user.entity';
 
 @Injectable()
-export class RoleGuard implements CanActivate {
+export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(
