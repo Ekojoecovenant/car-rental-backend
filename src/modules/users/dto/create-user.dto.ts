@@ -26,8 +26,6 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
-  @IsPhoneNumber('GH', {
-    message: 'Please provide a valid Ghanaian phone number',
-  })
+  @IsPhoneNumber()
   phoneNumber?: string;
 }

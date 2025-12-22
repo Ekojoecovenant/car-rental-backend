@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '../modules/users/entities/user.entity';
+import { Vehicle } from '../modules/vehicles/entities/vehicle.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -14,7 +15,7 @@ export const getDatabaseConfig = (
   ssl: {
     rejectUnauthorized: false, // Required for Neon
   },
-  entities: [User], // Explicit import - we'll add more as we create them
+  entities: [User, Vehicle], // Explicit import - we'll add more as we create them
   synchronize: configService.get<string>('NODE_ENV') === 'development',
   logging: configService.get<string>('NODE_ENV') === 'development',
 });

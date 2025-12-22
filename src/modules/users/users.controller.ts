@@ -59,7 +59,7 @@ export class UsersController {
     void password;
 
     return {
-      messagee: 'User updated succesfully',
+      message: 'User updated succesfully',
       data: result,
     };
   }
