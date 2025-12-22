@@ -43,6 +43,13 @@ export class VehicleService {
       });
     }
 
+    // Filter for self-drive only
+    if (filterDto?.selfDriverOnly === true) {
+      query.andWhere('vehicle.requiresDriver = :requiresDriver', {
+        requiresDriver: false,
+      });
+    }
+
     return query.orderBy('vehilce.createdAt', 'DESC').getMany();
     // return this.vehicleRepository.find();
   }

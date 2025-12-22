@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
 import { VehicleCategory } from '../entities/vehicle.entity';
 import { Type } from 'class-transformer';
 
@@ -18,4 +18,9 @@ export class FilterVehicleDto {
   @IsNumber()
   @Min(0)
   maxPrice?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  selfDriverOnly?: boolean;
 }

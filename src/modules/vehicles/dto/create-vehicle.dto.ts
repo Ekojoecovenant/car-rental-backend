@@ -2,6 +2,7 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -70,4 +71,8 @@ export class CreateVehicleDto {
   @ArrayMaxSize(3, { message: 'Maximum 3 images allowed' })
   @IsString({ each: true })
   images: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  requiresDriver?: boolean;
 }

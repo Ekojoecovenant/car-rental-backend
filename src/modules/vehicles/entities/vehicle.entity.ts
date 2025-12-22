@@ -73,6 +73,9 @@ export class Vehicle {
   @Column({ type: 'simple-array' })
   images: string[];
 
+  @Column({ name: 'requires_driver', default: false })
+  requiresDriver: boolean;
+
   @Column({ name: 'is_available', default: true })
   isAvailable: boolean;
 
