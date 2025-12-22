@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-user.dto';
+import { FilterVehicleDto } from './dto/filter-vehicle.dto';
 
 @Injectable()
 export class VehicleService {
@@ -17,13 +18,38 @@ export class VehicleService {
     return this.vehicleRepository.save(vehicle);
   }
 
-  async findAll(): Promise<Vehicle[]> {
-    return this.vehicleRepository.find();
+  async findAll(filterDto?: FilterVehicleDto): Promise<Vehicle[]> {
+    const query = this.vehicleRepository
+      .createQueryBuilder('vehicle')
+      .where('vehicle.isActive = :isActive', { isActive: true });
+
+    // Filter by category
+    if (filterDto?.category) {
+      query.andWhere('vehicle.category = :category', {
+        category: filterDto.category,
+      });
+    }
+
+    // Filter by price range
+    if (filterDto?.minPrice) {
+      query.andWhere('vehicle.dailyRate >= :minPrice', {
+        minPrice: filterDto.minPrice,
+      });
+    }
+
+    if (filterDto?.maxPrice) {
+      query.andWhere('vehicle.dailyRate >= :maxPrice', {
+        maxPrice: filterDto.maxPrice,
+      });
+    }
+
+    return query.orderBy('vehilce.createdAt', 'DESC').getMany();
+    // return this.vehicleRepository.find();
   }
 
   async findById(id: string): Promise<Vehicle> {
     const vehicle = await this.vehicleRepository.findOne({
-      where: { id },
+      where: { id, isActive: true },
     });
 
     if (!vehicle) {
@@ -40,6 +66,12 @@ export class VehicleService {
     const vehicle = await this.findById(id);
 
     Object.assign(vehicle, updateVehicleDto);
+    return this.vehicleRepository.save(vehicle);
+  }
+
+  async toggleAvailability(id: string): Promise<Vehicle> {
+    const vehicle = await this.findById(id);
+    vehicle.isAvailable = !vehicle.isAvailable;
     return this.vehicleRepository.save(vehicle);
   }
 
