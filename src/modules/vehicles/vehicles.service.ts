@@ -50,7 +50,7 @@ export class VehiclesService {
       });
     }
 
-    return query.orderBy('vehilce.createdAt', 'DESC').getMany();
+    return query.orderBy('vehicle.createdAt', 'DESC').getMany();
     // return this.vehicleRepository.find();
   }
 

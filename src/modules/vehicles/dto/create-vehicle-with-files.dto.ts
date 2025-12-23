@@ -1,16 +1,9 @@
 import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  IsArray,
-  IsBoolean,
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
-  Max,
   MaxLength,
-  Min,
 } from 'class-validator';
 import {
   FuelType,
@@ -18,7 +11,7 @@ import {
   VehicleCategory,
 } from '../entities/vehicle.entity';
 
-export class CreateVehicleDto {
+export class CreateVehicleWithFilesDto {
   @IsNotEmpty()
   @IsString()
   make: string;
@@ -28,25 +21,20 @@ export class CreateVehicleDto {
   model: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(1900)
-  @Max(new Date().getFullYear() + 1)
-  year: number;
+  @IsString()
+  year: string;
 
   @IsNotEmpty()
   @IsEnum(VehicleCategory)
   category: VehicleCategory;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(0)
-  dailyRate: number;
+  @IsString()
+  dailyRate: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(1)
-  @Max(50)
-  seatingCapacity: number;
+  @IsString()
+  seatingCapacity: string;
 
   @IsNotEmpty()
   @IsEnum(TransmissionType)
@@ -58,21 +46,15 @@ export class CreateVehicleDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(700)
+  @MaxLength(500)
   features?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(1200)
+  @MaxLength(1000)
   description?: string;
 
-  @IsArray()
-  @ArrayMinSize(1, { message: 'At least 1 image is required' })
-  @ArrayMaxSize(3, { message: 'Maximum 3 images allowed' })
-  @IsString({ each: true })
-  images: string[];
-
   @IsOptional()
-  @IsBoolean()
-  requiresDriver?: boolean;
+  @IsString()
+  requiresDriver?: string;
 }

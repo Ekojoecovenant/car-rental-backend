@@ -15,7 +15,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
-import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-user.dto';
 import { CloudinaryService } from './cloudinary.service';
 import { FilterVehicleDto } from './dto/filter-vehicle.dto';
@@ -24,6 +23,8 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { CreateVehicleWithFilesDto } from './dto/create-vehicle-with-files.dto';
+import { CreateVehicleDto } from './dto/create-vehicle.dto';
 
 @Controller('vehicles')
 export class VehiclesController {
@@ -61,7 +62,7 @@ export class VehiclesController {
   @UseInterceptors(FilesInterceptor('images', 3))
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @Body() createVehicleDto: CreateVehicleDto,
+    @Body() createVehicleDto: CreateVehicleWithFilesDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     // Validate files
@@ -89,11 +90,44 @@ export class VehiclesController {
     // Upload images to Cloudinary
     const imageUrls = await this.cloudinaryService.uploadMultipleImages(files);
 
-    // Create vehicle with image URLs
-    const vehicleData = {
-      ...createVehicleDto,
+    // Convert string values to proper types
+    const vehicleData: CreateVehicleDto = {
+      make: createVehicleDto.make,
+      model: createVehicleDto.model,
+      year: parseInt(createVehicleDto.year, 10),
+      category: createVehicleDto.category,
+      dailyRate: parseFloat(createVehicleDto.dailyRate),
+      seatingCapacity: parseInt(createVehicleDto.seatingCapacity, 10),
+      transmission: createVehicleDto.transmission,
+      fuelType: createVehicleDto.fuelType,
+      features: createVehicleDto.features,
+      description: createVehicleDto.description,
+      requiresDriver: createVehicleDto.requiresDriver === 'true',
       images: imageUrls,
     };
+
+    // Validate converted data
+    if (
+      isNaN(vehicleData.year) ||
+      vehicleData.year < 1900 ||
+      vehicleData.year > 2026
+    ) {
+      throw new BadRequestException('Year must be between 1900 and 2026');
+    }
+
+    if (isNaN(vehicleData.dailyRate) || vehicleData.dailyRate < 0) {
+      throw new BadRequestException('Daily rate must be a positive number');
+    }
+
+    if (
+      isNaN(vehicleData.seatingCapacity) ||
+      vehicleData.seatingCapacity < 1 ||
+      vehicleData.seatingCapacity > 50
+    ) {
+      throw new BadRequestException(
+        'Seating capacity must be between 1 and 50',
+      );
+    }
 
     const vehicle = await this.vehicleService.create(vehicleData);
 
