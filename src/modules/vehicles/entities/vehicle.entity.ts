@@ -62,7 +62,7 @@ export class Vehicle {
     type: 'enum',
     enum: FuelType,
   })
-  FuelType: FuelType; // petrol, diesel, electric, hybrid
+  fuelType: FuelType; // petrol, diesel, electric, hybrid
 
   @Column({ type: 'text', nullable: true })
   features: string;
